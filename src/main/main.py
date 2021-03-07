@@ -41,7 +41,7 @@ def startSyncronousServer():
                 sock = key.fileobj
                 conn, addr = sock.accept()
                 conn.setblocking(False)
-                data = { 'out': b'', 'in': b'', 'addr':addr }
+                data = { 'out':b'', 'in':b'', 'addr':addr }
                 events = selectors.EVENT_READ | selectors.EVENT_WRITE
                 selector.register(conn, events, data=data)
             else:
