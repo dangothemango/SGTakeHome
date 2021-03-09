@@ -80,8 +80,7 @@ def processExistingConnection(selector, key, mask):
             processAllCommands(data)
         else:
             print('closing connection', data['addr'])
-            selector.unregister(sock)
-            sock.close()
+            closeConnection(selector, key)
     if mask & selectors.EVENT_WRITE:
         if data['out']:
             sent = sock.send(data['out'])
@@ -91,13 +90,20 @@ def eventLoop(selector):
     while True:
         events = selector.select(timeout=None)
         for key, mask in events:
-            if key.data is None:
-                try:
-                    loadNewConnection(selector, key)
-                except Exception as e:
-                    print("error while reading from connection", e)
-            else:
-                processExistingConnection(selector, key, mask)
+            #using a try because one failure shouldnt stop the server
+            try:
+                if key.data is None:
+                        loadNewConnection(selector, key)
+                else:
+                    processExistingConnection(selector, key, mask)
+            except Exception as e:
+                print("error while reading from connection", e)
+                closeConnection(selector, key)
+
+def closeConnection(selector, key):
+    sock = key.fileobj
+    selector.unregister(sock)
+    sock.close()
 
 if __name__ == '__main__':
     startSyncronousServer()
