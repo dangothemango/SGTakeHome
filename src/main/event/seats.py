@@ -13,18 +13,20 @@ class SeatReservations:
 
     def reserve(self, seat):
         # A free seat should never be in self.seatStates but the or is in there just in case implementation changes
+        r = False
         if (seat not in self.seatStates or self.seatStates[seat] == STATE.FREE):
             self.seatStates[seat] = STATE.RESERVED
-            return True
-        return False
+            r = True
+        return r, None
 
     def buy(self, seat):
+        r = False
         if (seat in self.seatStates and self.seatStates[seat] == STATE.RESERVED):
             self.seatStates[seat] = STATE.SOLD
-            return True
-        return False
+            r = True
+        return r, None
 
     def query(self, seat):
         if (seat not in self.seatStates):
-            return STATE.FREE.name
-        return self.seatStates[seat].name
+            return True, STATE.FREE.name
+        return True, self.seatStates[seat].name
